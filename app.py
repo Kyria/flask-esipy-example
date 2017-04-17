@@ -29,7 +29,7 @@ import logging
 import time
 
 # logger stuff
-logger = logging.getLogger('flask-esipy-example')
+logger = logging.getLogger(__name__)
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
@@ -49,7 +49,7 @@ migrate = Migrate(app, db)
 # init flask login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'sso.login'
+login_manager.login_view = 'login'
 
 
 # -----------------------------------------------------------------------
