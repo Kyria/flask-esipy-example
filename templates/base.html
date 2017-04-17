@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="G. (Kyria) Bisch">
+
+    <title>Flask - EsiPy - Example</title>
+
+</head>
+
+<body>
+
+{% if not current_user.is_authenticated %}
+<a href="{{ url_for('login') }}">
+    <img src="https://images.contentful.com/idjq7aai9ylm/18BxKSXCymyqY4QKo8KwKe/c2bdded6118472dd587c8107f24104d7/EVE_SSO_Login_Buttons_Small_White.png?w=195&amp;h=30" alt="Log in with eveonline.com" />
+</a>
+
+{% else %}
+Hello <strong>{{ current_user.character_name }}</strong><br>
+Your wallet is currently full of <strong>{{ wallet.data[0].balance }}</strong> ISKs
+<br>
+<br>
+
+<strong>Your ESI Informations:</strong>
+<dl>
+    <dt>Character ID:</dt><dd>{{ current_user.character_id }}</dd>
+    <dt>Character Owner Hash:</dt><dd>{{ current_user.character_owner_hash }}</dd>
+    <dt>Access Token:</dt><dd>{{ current_user.access_token }}</dd>
+    <dt>Access Token valid until:</dt><dd>{{ current_user.access_token_expires }}</dd>
+    <dt>Refresh Token:</dt><dd>{{ current_user.refresh_token }}</dd>
+</dl>
+<br>
+<br>
+<br>
+<a href="{{ url_for('logout') }}">Logout</a>
+{% endif %}
