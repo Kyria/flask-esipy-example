@@ -7,8 +7,6 @@ from esipy import EsiSecurity
 from esipy.exceptions import APIException
 
 from flask import Flask
-from flask import flash
-from flask import g
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -143,7 +141,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out successfully.", 'info')
     return redirect(url_for("index"))
 
 
@@ -182,20 +179,18 @@ def callback():
     user.character_name = cdata['CharacterName']
     user.update_token(auth_response)
 
-    # now the user is ready, so update/create it
+    # now the user is ready, so update/create it and log the user
     try:
         db.session.merge(user)
         db.session.commit()
 
         login_user(user)
         session.permanent = True
-        flash('You have successfully logged in.', 'success')
 
     except:
         logger.exception("Cannot login the user - uid: %d" % user.character_id)
         db.session.rollback()
         logout_user()
-        flash('Something went wrong. Please try to login again', 'error')
 
     return redirect(url_for("index"))
 
@@ -205,7 +200,7 @@ def callback():
 # -----------------------------------------------------------------------
 @app.route('/')
 def index():
-    wallet = {}
+    wallet = None
 
     # if the user is authed, get the wallet content !
     if current_user.is_authenticated:
