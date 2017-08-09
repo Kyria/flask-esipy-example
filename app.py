@@ -208,7 +208,7 @@ def index():
         # if the access token need some update
         esisecurity.update_token(current_user.get_sso_data())
 
-        op = esiapp.op['get_characters_character_id_wallets'](
+        op = esiapp.op['get_characters_character_id_wallet'](
             character_id=current_user.character_id
         )
         wallet = esiclient.request(op)
