@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 4. Setup the FLASK_APP environment variable
 ```shell
-export FLASK_APP=app
+export FLASK_APP=app.py
 ```
 
 
