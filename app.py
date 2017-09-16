@@ -25,7 +25,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 
 import config
+import hashlib
+import hmac
 import logging
+import random
 import time
 
 # logger stuff
@@ -129,11 +132,26 @@ esiclient = EsiClient(
 # -----------------------------------------------------------------------
 # Login / Logout Routes
 # -----------------------------------------------------------------------
+def generate_token():
+    """Generates a non-guessable OAuth token"""
+    chars = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+    rand = random.SystemRandom()
+    random_string = ''.join(rand.choice(chars) for _ in range(40))
+    return hmac.new(
+        config.SECRET_KEY,
+        random_string,
+        hashlib.sha256
+    ).hexdigest()
+
+
 @app.route('/sso/login')
 def login():
     """ this redirects the user to the EVE SSO login """
+    token = generate_token()
+    session['token'] = token
     return redirect(esisecurity.get_auth_uri(
-        scopes=['esi-wallet.read_character_wallet.v1']
+        scopes=['esi-wallet.read_character_wallet.v1'],
+        state=token,
     ))
 
 
@@ -149,6 +167,12 @@ def callback():
     """ This is where the user comes after he logged in SSO """
     # get the code from the login process
     code = request.args.get('code')
+    token = request.args.get('state')
+
+    # compare the state with the saved token for CSRF check
+    sess_token = session.pop('token', None)
+    if sess_token is None or token is None or token != sess_token:
+        return 'Login EVE Online SSO failed: Session Token Mismatch', 403
 
     # now we try to get tokens
     try:
