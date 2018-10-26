@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from datetime import datetime
 
-from esipy import App
+from esipy import EsiApp
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.exceptions import APIException
@@ -111,11 +111,10 @@ def load_user(character_id):
 # ESIPY Init
 # -----------------------------------------------------------------------
 # create the app
-esiapp = App.create(config.ESI_SWAGGER_JSON)
+esiapp = EsiApp.get_latest_swagger
 
 # init the security object
 esisecurity = EsiSecurity(
-    app=esiapp,
     redirect_uri=config.ESI_CALLBACK,
     client_id=config.ESI_CLIENT_ID,
     secret_key=config.ESI_SECRET_KEY,
@@ -150,8 +149,8 @@ def login():
     token = generate_token()
     session['token'] = token
     return redirect(esisecurity.get_auth_uri(
-        scopes=['esi-wallet.read_character_wallet.v1'],
         state=token,
+        scopes=['esi-wallet.read_character_wallet.v1']
     ))
 
 
@@ -192,15 +191,15 @@ def callback():
     # sure the owner is still the same, but that's an example only...
     try:
         user = User.query.filter(
-            User.character_id == cdata['CharacterID'],
+            User.character_id == cdata['sub'].split(':')[2],
         ).one()
 
     except NoResultFound:
         user = User()
-        user.character_id = cdata['CharacterID']
+        user.character_id = cdata['sub'].split(':')[2]
 
-    user.character_owner_hash = cdata['CharacterOwnerHash']
-    user.character_name = cdata['CharacterName']
+    user.character_owner_hash = cdata['owner']
+    user.character_name = cdata['name']
     user.update_token(auth_response)
 
     # now the user is ready, so update/create it and log the user
