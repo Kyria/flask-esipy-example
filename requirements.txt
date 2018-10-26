@@ -8,4 +8,4 @@ sqlalchemy>=1.1.9
 simplejson>=3.10.0
 
 # eve online ESI lib
-esipy>=0.1.3
+esipy>=1.0.0
