@@ -69,7 +69,7 @@ class User(db.Model, UserMixin):
     character_name = db.Column(db.String(200))
 
     # SSO Token stuff
-    access_token = db.Column(db.String(100))
+    access_token = db.Column(db.String(4096))
     access_token_expires = db.Column(db.DateTime())
     refresh_token = db.Column(db.String(100))
 
@@ -111,7 +111,7 @@ def load_user(character_id):
 # ESIPY Init
 # -----------------------------------------------------------------------
 # create the app
-esiapp = EsiApp.get_latest_swagger
+esiapp = EsiApp().get_latest_swagger
 
 # init the security object
 esisecurity = EsiSecurity(
